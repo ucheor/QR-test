@@ -1,0 +1,23 @@
+name: run install playbook
+on: 
+    push:
+      branches: [ main ]
+jobs:
+    install:
+      runs-on: self-hosted
+      steps:
+        - name: git checkout
+          uses: actions/checkout@v4
+
+        - name: create Ansible vault password file
+          run: |
+            echo ${secrets.ANSIBLE_VAULT_PASSWORD} > .ansible_vault_password
+            chmod 600 .ansible_vault_password
+
+        - name: run playbook
+          run: ansible-playbook install-playbook.yml \
+            --vault-password-file .ansible_vault_password
+
+        - name: delete .ansible_vault_password file
+          if: always()
+          run: rm -f .ansible_vault_password

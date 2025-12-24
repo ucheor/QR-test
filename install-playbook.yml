@@ -1,0 +1,43 @@
+---
+- name: install package
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install Apache on Ubuntu/Debian
+      package:
+        name: apache2
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install Apache on CentOS/RHEL
+      package:
+        name: httpd
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Start and enable Apache on Ubuntu/Debian
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Start and enable Apache on CentOS/RHEL
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Create index.html with custom text
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <html>
+          <body>
+            <h1>Installed using Ansible - updated! </h1>
+            <p>Deployed via CI/CD pipeline - GitHub Actions</p>
+          </body>
+          </html>
+        mode: '0644'
